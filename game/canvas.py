@@ -1,19 +1,23 @@
 import time
 import curses
 
+import animation
+
 
 def draw_screen_with_border(canvas: curses.window):
     curses.curs_set(False)
+    curses.update_lines_cols()
+    canvas.border()
 
     row, column = (5, 20)
-    canvas.addstr(row, column, 'Hello, World!')
 
     while True:
-        curses.update_lines_cols()
-        canvas.border()
-        canvas.refresh()
-        time.sleep(1)
+        animation.dim("*", canvas, row, column)
 
 
-if __name__ == '__main__':
+def init():
     curses.wrapper(draw_screen_with_border)
+
+
+if __name__ == "__main__":
+    init()
