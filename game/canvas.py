@@ -10,14 +10,17 @@ def draw_screen_with_border(canvas: curses.window):
     canvas.border()
 
     row, column = (5, 20)
-    frame_lengths = (2, 0.3, 0.5, 0.3, 0)
+    frame_lengths = (2, 0.3, 0.5, 0.3)
 
-    coroutine = animation.blink("*", canvas, row, column)
-    for timeout in frame_lengths:
-        coroutine.send(None)
-        canvas.refresh()
-        time.sleep(timeout)
-    time.sleep(10)
+    coroutines = [
+        animation.blink("*", canvas, row, column + i) for i in range(0, 10, 2)
+    ]
+    while True:
+        for timeout in frame_lengths:
+            for coroutine in coroutines:
+                coroutine.send(None)
+                canvas.refresh()
+            time.sleep(timeout)
 
 
 def init():
