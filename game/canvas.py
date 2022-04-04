@@ -1,3 +1,4 @@
+import random
 import time
 import curses
 
@@ -9,18 +10,26 @@ def draw_screen_with_border(canvas: curses.window):
     curses.update_lines_cols()
     canvas.border()
 
-    row, column = (5, 20)
-    frame_lengths = (2, 0.3, 0.5, 0.3)
+    coroutines = []
+    TICK_TIMEOUT = 0.1
+    screen_rows, screen_columns = canvas.getmaxyx()
+    stars_count = round(screen_rows * screen_columns * 0.25)
+    print(stars_count)
+    for _ in range(stars_count):
+        coroutines.append(
+            animation.blink(
+                symbol=random.choice("+*.:"),
+                canvas=canvas,
+                row=random.randint(1, screen_rows - 2),
+                column=random.randint(1, screen_columns - 2),
+            )
+        )
 
-    coroutines = [
-        animation.blink("*", canvas, row, column + i) for i in range(0, 10, 2)
-    ]
     while True:
-        for timeout in frame_lengths:
-            for coroutine in coroutines:
-                coroutine.send(None)
-                canvas.refresh()
-            time.sleep(timeout)
+        for coroutine in coroutines:
+            coroutine.send(None)
+        canvas.refresh()
+        time.sleep(TICK_TIMEOUT)
 
 
 def init():
