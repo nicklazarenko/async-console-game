@@ -8,7 +8,6 @@ import animation
 def draw_screen_with_border(canvas: curses.window):
     curses.curs_set(False)
     curses.update_lines_cols()
-    canvas.border()
 
     coroutines = []
     TICK_TIMEOUT = 0.1
@@ -25,9 +24,15 @@ def draw_screen_with_border(canvas: curses.window):
             )
         )
 
+    coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
+
     while True:
-        for coroutine in coroutines:
-            coroutine.send(None)
+        for coroutine in coroutines.copy():
+            try:
+                coroutine.send(None)
+            except StopIteration:
+                coroutines.remove(coroutine)
+        canvas.border()
         canvas.refresh()
         time.sleep(TICK_TIMEOUT)
 
