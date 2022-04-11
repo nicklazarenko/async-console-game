@@ -1,8 +1,17 @@
+import os
 import random
 import time
 import curses
 
 import animation
+
+
+def load_frames():
+    frames = {}
+    for filename in os.listdir("frames"):
+        with open(f"frames/{filename}") as content:
+            frames[filename] = content.read()
+    return frames
 
 
 def draw_screen_with_border(canvas: curses.window):
@@ -13,7 +22,6 @@ def draw_screen_with_border(canvas: curses.window):
     TICK_TIMEOUT = 0.1
     screen_rows, screen_columns = canvas.getmaxyx()
     stars_count = round(screen_rows * screen_columns * 0.25)
-    print(stars_count)
     for _ in range(stars_count):
         coroutines.append(
             animation.blink(
@@ -24,7 +32,14 @@ def draw_screen_with_border(canvas: curses.window):
             )
         )
 
+    frames = load_frames()
+
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
+    coroutines.append(
+        animation.animate_spaceship(
+            canvas, screen_rows // 2, screen_columns // 2 - 2, frames
+        )
+    )
 
     while True:
         for coroutine in coroutines.copy():

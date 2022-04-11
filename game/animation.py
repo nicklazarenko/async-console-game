@@ -1,22 +1,10 @@
 import asyncio
 import curses
+import itertools
 import random
 import time
 
-
-def dim(char: str, canvas: curses.window, row: int, column: int):
-    canvas.addstr(row, column, char, curses.A_DIM)
-    canvas.refresh()
-    time.sleep(2)
-    canvas.addstr(row, column, char)
-    canvas.refresh()
-    time.sleep(0.3)
-    canvas.addstr(row, column, char, curses.A_BOLD)
-    canvas.refresh()
-    time.sleep(0.5)
-    canvas.addstr(row, column, char)
-    canvas.refresh()
-    time.sleep(0.3)
+import helpers
 
 
 async def blink(symbol: str, canvas: curses.window, row: int, column: int):
@@ -38,7 +26,13 @@ async def blink(symbol: str, canvas: curses.window, row: int, column: int):
             await asyncio.sleep(0)
 
 
-async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
+async def fire(
+    canvas: curses.window,
+    start_row: int,
+    start_column: int,
+    rows_speed: float = -0.3,
+    columns_speed: float = 0,
+):
     """Display animation of gun shot, direction and speed can be specified."""
 
     row, column = start_row, start_column
@@ -66,3 +60,13 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
         canvas.addstr(round(row), round(column), " ")
         row += rows_speed
         column += columns_speed
+
+
+async def animate_spaceship(
+    canvas: curses.window, row: int, column: int, frames: dict[str, str]
+):
+    for frame in itertools.cycle([frames["rocket_frame_1"], frames["rocket_frame_2"]]):
+        helpers.draw_frame(canvas, row, column, frame)
+        canvas.refresh()
+        await asyncio.sleep(0)
+        helpers.draw_frame(canvas, row, column, frame, negative=True)
