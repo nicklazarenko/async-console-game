@@ -6,6 +6,9 @@ import curses
 import animation
 
 
+TICK_TIMEOUT = 0.1
+
+
 def load_frames():
     frames = {}
     for filename in os.listdir("frames"):
@@ -17,9 +20,11 @@ def load_frames():
 def draw_screen_with_border(canvas: curses.window):
     curses.curs_set(False)
     curses.update_lines_cols()
+    canvas.nodelay(True)
 
+    frames = load_frames()
     coroutines = []
-    TICK_TIMEOUT = 0.1
+
     screen_rows, screen_columns = canvas.getmaxyx()
     stars_count = round(screen_rows * screen_columns * 0.25)
     for _ in range(stars_count):
@@ -31,8 +36,6 @@ def draw_screen_with_border(canvas: curses.window):
                 column=random.randint(1, screen_columns - 2),
             )
         )
-
-    frames = load_frames()
 
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
     coroutines.append(

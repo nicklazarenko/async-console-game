@@ -70,3 +70,7 @@ async def animate_spaceship(
         canvas.refresh()
         await asyncio.sleep(0)
         helpers.draw_frame(canvas, row, column, frame, negative=True)
+
+        rows_direction, columns_direction, space_pressed = helpers.read_controls(canvas)
+        row += rows_direction
+        column += columns_direction
