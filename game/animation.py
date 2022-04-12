@@ -2,6 +2,7 @@ import asyncio
 import curses
 import itertools
 import random
+import statistics
 import time
 
 import helpers
@@ -65,12 +66,25 @@ async def fire(
 async def animate_spaceship(
     canvas: curses.window, row: int, column: int, frames: dict[str, str]
 ):
+    SPACESHIP_TIMEOUT = 10
+    SPACESHIP_STEP = 1
     for frame in itertools.cycle([frames["rocket_frame_1"], frames["rocket_frame_2"]]):
         helpers.draw_frame(canvas, row, column, frame)
         canvas.refresh()
-        await asyncio.sleep(0)
+        for _ in range(SPACESHIP_TIMEOUT):
+            await asyncio.sleep(0)
         helpers.draw_frame(canvas, row, column, frame, negative=True)
 
         rows_direction, columns_direction, space_pressed = helpers.read_controls(canvas)
-        row += rows_direction
-        column += columns_direction
+        screen_rows, screen_columns = canvas.getmaxyx()
+        frame_rows, frame_columns = helpers.get_frame_size(frame)
+        row = statistics.median(
+            [1, row + rows_direction * SPACESHIP_STEP, screen_rows - frame_rows - 1]
+        )
+        column = statistics.median(
+            [
+                1,
+                column + columns_direction * SPACESHIP_STEP,
+                screen_columns - frame_columns - 1,
+            ]
+        )
