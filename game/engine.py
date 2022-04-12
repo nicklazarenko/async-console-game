@@ -3,46 +3,58 @@ import random
 import time
 import curses
 
-import animation
+from game import animation
 
 
 TICK_TIMEOUT = 0.1
+STARS_FRACTION = 0.2
+SPACESHIP_TIMEOUT = 1
+SPACESHIP_MOVE_STEP = 1
 
 
-def load_frames():
+def load_frames() -> dict[str, str]:
+    package_dir, _ = os.path.split(__file__)
+    frames_dir = os.path.join(package_dir, "frames")
+
     frames = {}
-    for filename in os.listdir("frames"):
-        with open(f"frames/{filename}") as content:
+    for filename in os.listdir(frames_dir):
+        with open(os.path.join(frames_dir, filename)) as content:
             frames[filename] = content.read()
+
     return frames
 
 
-def draw_screen_with_border(canvas: curses.window):
+def run_loop(canvas: curses.window):
     curses.curs_set(False)
     curses.update_lines_cols()
     canvas.nodelay(True)
 
     frames = load_frames()
     coroutines = []
-
     screen_rows, screen_columns = canvas.getmaxyx()
-    stars_count = round(screen_rows * screen_columns * 0.25)
+
+    stars_count = round(screen_rows * screen_columns * STARS_FRACTION)
     for _ in range(stars_count):
         coroutines.append(
             animation.blink(
-                symbol=random.choice("+*.:"),
                 canvas=canvas,
                 row=random.randint(1, screen_rows - 2),
                 column=random.randint(1, screen_columns - 2),
+                symbol=random.choice("+*.:"),
             )
         )
 
-    coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
     coroutines.append(
         animation.animate_spaceship(
-            canvas, screen_rows // 2, screen_columns // 2 - 2, frames
+            canvas,
+            screen_rows // 2,
+            screen_columns // 2 - 2,
+            frames,
+            SPACESHIP_TIMEOUT,
+            SPACESHIP_MOVE_STEP,
         )
     )
+    coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
 
     while True:
         for coroutine in coroutines.copy():
@@ -55,9 +67,9 @@ def draw_screen_with_border(canvas: curses.window):
         time.sleep(TICK_TIMEOUT)
 
 
-def init():
-    curses.wrapper(draw_screen_with_border)
+def main():
+    curses.wrapper(run_loop)
 
 
 if __name__ == "__main__":
-    init()
+    main()

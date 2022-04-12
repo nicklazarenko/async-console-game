@@ -1,9 +1,12 @@
 [tool.poetry]
-name = "async-console-game"
-version = "0.1.0"
-description = ""
+name = "spaceship-game"
+version = "1.0.0"
+description = "Async console game"
 authors = ["Nick Lazarenko <82189469+nicklazarenko@users.noreply.github.com>"]
 license = "GPL-3.0-or-later"
+packages = [
+    { include = "game" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -13,3 +16,6 @@ python = "^3.10"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+spaceship-game = "game.engine:main"
