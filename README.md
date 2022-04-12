@@ -1,4 +1,4 @@
-!(https://dvmn.org/media/lessons/ezgif.com-optimize_YgtCKU0.gif)
+![](https://dvmn.org/media/lessons/ezgif.com-optimize_YgtCKU0.gif)
 
 # Summary
 
