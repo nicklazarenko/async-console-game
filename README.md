@@ -6,4 +6,4 @@ Async console game built on custom event loop. You control a spaceship flying th
 
 # Usage
 
-Install the released package and run `spaceship-game`. Or simply launch `game/engine.py` with `python3`.
+Install the released package and run `spaceship-game`. Or simply `make run`.

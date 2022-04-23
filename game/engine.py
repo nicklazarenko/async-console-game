@@ -69,7 +69,3 @@ def run_loop(canvas: curses.window):
 
 def main():
     curses.wrapper(run_loop)
-
-
-if __name__ == "__main__":
-    main()
