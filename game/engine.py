@@ -56,6 +56,10 @@ def run_loop(canvas: curses.window):
     )
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
 
+    coroutines.append(
+        animation.fly_garbage(canvas, column=10, garbage_frame=frames["duck"])
+    )
+
     while True:
         for coroutine in coroutines.copy():
             try:

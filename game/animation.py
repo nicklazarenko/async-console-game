@@ -88,3 +88,21 @@ async def animate_spaceship(
                 screen_columns - frame_columns - 1,
             ]
         )
+
+
+async def fly_garbage(
+    canvas: curses.window, column: int, garbage_frame: str, speed: float = 0.5
+):
+    """Animate garbage, flying from top to bottom. Сolumn position will stay the same, as specified on start."""
+    rows_number, columns_number = canvas.getmaxyx()
+
+    column = max(column, 0)
+    column = min(column, columns_number - 1)
+
+    row = 0
+
+    while row < rows_number:
+        helpers.draw_frame(canvas, row, column, garbage_frame)
+        await asyncio.sleep(0)
+        helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
+        row += speed
