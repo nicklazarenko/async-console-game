@@ -1,3 +1,4 @@
+import asyncio
 import curses
 
 
@@ -75,3 +76,8 @@ def get_frame_size(text: str) -> tuple[int, int]:
     rows = len(lines)
     columns = max([len(line) for line in lines])
     return rows, columns
+
+
+async def sleep(ticks: int):
+    for _ in range(ticks):
+        await asyncio.sleep(0)

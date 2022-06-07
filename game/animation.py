@@ -1,4 +1,3 @@
-import asyncio
 import curses
 import itertools
 import random
@@ -12,20 +11,16 @@ from game import helpers
 async def blink(canvas: curses.window, row: int, column: int, symbol: str):
     while True:
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        for _ in range(random.randint(20, 80)):
-            await asyncio.sleep(0)
+        await helpers.sleep(random.randint(20, 80))
 
         canvas.addstr(row, column, symbol)
-        for _ in range(3):
-            await asyncio.sleep(0)
+        await helpers.sleep(3)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        for _ in range(5):
-            await asyncio.sleep(0)
+        await helpers.sleep(5)
 
         canvas.addstr(row, column, symbol)
-        for _ in range(3):
-            await asyncio.sleep(0)
+        await helpers.sleep(3)
 
 
 async def fire(
@@ -38,10 +33,10 @@ async def fire(
     row, column = start_row, start_column
 
     canvas.addstr(round(row), round(column), "*")
-    await asyncio.sleep(0)
+    await helpers.sleep(1)
 
     canvas.addstr(round(row), round(column), "O")
-    await asyncio.sleep(0)
+    await helpers.sleep(1)
     canvas.addstr(round(row), round(column), " ")
 
     row += rows_speed
@@ -56,7 +51,7 @@ async def fire(
 
     while 0 < row < max_row and 0 < column < max_column:
         canvas.addstr(round(row), round(column), symbol)
-        await asyncio.sleep(0)
+        await helpers.sleep(1)
         canvas.addstr(round(row), round(column), " ")
         row += rows_speed
         column += columns_speed
@@ -73,7 +68,7 @@ async def animate_spaceship(
     order = [frames["rocket_frame_1"]] * timeout + [frames["rocket_frame_2"]] * timeout
     for frame in itertools.cycle(order):
         helpers.draw_frame(canvas, row, column, frame)
-        await asyncio.sleep(0)
+        await helpers.sleep(1)
         helpers.draw_frame(canvas, row, column, frame, negative=True)
 
         rows_direction, columns_direction, space_pressed = helpers.read_controls(canvas)
@@ -104,7 +99,7 @@ async def fly_garbage(
 
     while row < rows_number:
         helpers.draw_frame(canvas, row, column, garbage_frame)
-        await asyncio.sleep(0)
+        await helpers.sleep(1)
         helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
         row += speed
 
@@ -124,4 +119,4 @@ async def fill_orbit_with_garbage(canvas: curses.window, frames: dict[str, str])
         )
 
         for _ in range(random.randint(15, 30)):
-            await asyncio.sleep(0)
+            await helpers.sleep(1)
