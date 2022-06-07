@@ -11,6 +11,8 @@ STARS_FRACTION = 0.2
 SPACESHIP_TIMEOUT = 2
 SPACESHIP_MOVE_STEP = 1
 
+coroutines = []  # main event loop should be accessible outside of the module
+
 
 def load_frames() -> dict[str, str]:
     package_dir, _ = os.path.split(__file__)
@@ -30,7 +32,6 @@ def run_loop(canvas: curses.window):
     canvas.nodelay(True)
 
     frames = load_frames()
-    coroutines = []
     screen_rows, screen_columns = canvas.getmaxyx()
 
     stars_count = round(screen_rows * screen_columns * STARS_FRACTION)
@@ -56,9 +57,7 @@ def run_loop(canvas: curses.window):
     )
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
 
-    coroutines.append(
-        animation.fly_garbage(canvas, column=10, garbage_frame=frames["duck"])
-    )
+    coroutines.append(animation.fill_orbit_with_garbage(canvas, frames))
 
     while True:
         for coroutine in coroutines.copy():

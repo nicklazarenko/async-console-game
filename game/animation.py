@@ -5,6 +5,7 @@ import random
 import statistics
 import time
 
+from game import engine
 from game import helpers
 
 
@@ -106,3 +107,21 @@ async def fly_garbage(
         await asyncio.sleep(0)
         helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
         row += speed
+
+
+async def fill_orbit_with_garbage(canvas: curses.window, frames: dict[str, str]):
+    while True:
+        garbage_type = random.choice(
+            ["duck", "garbage_large", "garbage_small", "garbage_xl", "hubble", "lamp"]
+        )
+        _, frame_width = helpers.get_frame_size(frames[garbage_type])
+
+        _, columns_number = canvas.getmaxyx()
+        column = random.randint(0, columns_number - frame_width - 1)
+
+        engine.coroutines.append(
+            fly_garbage(canvas, column=column, garbage_frame=frames[garbage_type])
+        )
+
+        for _ in range(random.randint(15, 30)):
+            await asyncio.sleep(0)
