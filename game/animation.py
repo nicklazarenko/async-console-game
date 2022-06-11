@@ -6,6 +6,7 @@ import time
 
 from game import engine
 from game import helpers
+from game import physics
 
 
 async def blink(canvas: curses.window, row: int, column: int, symbol: str):
@@ -63,24 +64,28 @@ async def animate_spaceship(
     column: int,
     frames: dict[str, str],
     timeout: int = 1,
-    move_step: int = 1,
 ):
     order = [frames["rocket_frame_1"]] * timeout + [frames["rocket_frame_2"]] * timeout
+    row_speed = column_speed = 0
     for frame in itertools.cycle(order):
         helpers.draw_frame(canvas, row, column, frame)
         await helpers.sleep(1)
         helpers.draw_frame(canvas, row, column, frame, negative=True)
 
         rows_direction, columns_direction, space_pressed = helpers.read_controls(canvas)
+        row_speed, column_speed = physics.update_speed(
+            row_speed, column_speed, rows_direction, columns_direction
+        )
+        row += row_speed
+        column += column_speed
+
         screen_rows, screen_columns = canvas.getmaxyx()
         frame_rows, frame_columns = helpers.get_frame_size(frame)
-        row = statistics.median(
-            [1, row + rows_direction * move_step, screen_rows - frame_rows - 1]
-        )
+        row = statistics.median([1, row, screen_rows - frame_rows - 1])
         column = statistics.median(
             [
                 1,
-                column + columns_direction * move_step,
+                column,
                 screen_columns - frame_columns - 1,
             ]
         )

@@ -9,7 +9,6 @@ from game import animation
 TICK_TIMEOUT = 0.1
 STARS_FRACTION = 0.2
 SPACESHIP_TIMEOUT = 2
-SPACESHIP_MOVE_STEP = 1
 
 coroutines = []  # main event loop should be accessible outside of the module
 
@@ -52,7 +51,6 @@ def run_loop(canvas: curses.window):
             screen_columns // 2 - 2,
             frames,
             SPACESHIP_TIMEOUT,
-            SPACESHIP_MOVE_STEP,
         )
     )
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
