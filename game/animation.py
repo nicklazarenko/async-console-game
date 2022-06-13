@@ -58,6 +58,10 @@ async def fire(
         row += rows_speed
         column += columns_speed
 
+        for obstacle in engine.obstacle_list:
+            if obstacle.has_collision(row, column):
+                return
+
 
 async def animate_spaceship(
     canvas: curses.window,
