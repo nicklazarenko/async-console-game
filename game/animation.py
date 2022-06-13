@@ -75,7 +75,7 @@ async def animate_spaceship(
         rows_direction, columns_direction, space_pressed = helpers.read_controls(canvas)
 
         if space_pressed:
-            engine.coroutines.append(fire(canvas, row, column))
+            engine.coroutines.append(fire(canvas, row, column + 2))
 
         row_speed, column_speed = physics.update_speed(
             row_speed, column_speed, rows_direction, columns_direction
