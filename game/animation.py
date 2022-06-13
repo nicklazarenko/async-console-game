@@ -6,6 +6,7 @@ import time
 
 from game import engine
 from game import helpers
+from game import obstacles
 from game import physics
 
 
@@ -106,11 +107,17 @@ async def fly_garbage(
 
     row = 0
 
-    while row < rows_number:
-        helpers.draw_frame(canvas, row, column, garbage_frame)
-        await helpers.sleep(1)
-        helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
-        row += speed
+    obstacle = obstacles.Obstacle(row, column, *helpers.get_frame_size(garbage_frame))
+    engine.obstacle_list.append(obstacle)
+    try:
+        while row < rows_number:
+            helpers.draw_frame(canvas, row, column, garbage_frame)
+            await helpers.sleep(1)
+            helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
+            row += speed
+            obstacle.row = row
+    finally:
+        engine.obstacle_list.remove(obstacle)
 
 
 async def fill_orbit_with_garbage(canvas: curses.window, frames: dict[str, str]):

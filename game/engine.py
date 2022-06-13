@@ -4,13 +4,16 @@ import time
 import curses
 
 from game import animation
+from game import obstacles
 
 
 TICK_TIMEOUT = 0.1
 STARS_FRACTION = 0.2
 SPACESHIP_TIMEOUT = 2
+DEBUG_MODE = True
 
 coroutines = []  # main event loop should be accessible outside of the module
+obstacle_list = []
 
 
 def load_frames() -> dict[str, str]:
@@ -56,6 +59,9 @@ def run_loop(canvas: curses.window):
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
 
     coroutines.append(animation.fill_orbit_with_garbage(canvas, frames))
+
+    if DEBUG_MODE:
+        coroutines.append(obstacles.show_obstacles(canvas, obstacle_list))
 
     while True:
         for coroutine in coroutines.copy():
