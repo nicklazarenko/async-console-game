@@ -14,6 +14,7 @@ DEBUG_MODE = True
 
 coroutines = []  # main event loop should be accessible outside of the module
 obstacle_list = []
+obstacles_in_last_collisions = []
 
 
 def load_frames() -> dict[str, str]:

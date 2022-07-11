@@ -60,6 +60,7 @@ async def fire(
 
         for obstacle in engine.obstacle_list:
             if obstacle.has_collision(row, column):
+                engine.obstacles_in_last_collisions.append(obstacle)
                 return
 
 
@@ -118,6 +119,9 @@ async def fly_garbage(
             helpers.draw_frame(canvas, row, column, garbage_frame)
             await helpers.sleep(1)
             helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
+            if obstacle in engine.obstacles_in_last_collisions:
+                engine.obstacles_in_last_collisions.remove(obstacle)
+                return
             row += speed
             obstacle.row = row
     finally:
