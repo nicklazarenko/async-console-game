@@ -121,6 +121,8 @@ async def fly_garbage(
             helpers.draw_frame(canvas, row, column, garbage_frame, negative=True)
             if obstacle in engine.obstacles_in_last_collisions:
                 engine.obstacles_in_last_collisions.remove(obstacle)
+                rows, columns = helpers.get_frame_size(garbage_frame)
+                await explode(canvas, row + rows // 2, column + columns // 2)
                 return
             row += speed
             obstacle.row = row
@@ -144,3 +146,22 @@ async def fill_orbit_with_garbage(canvas: curses.window, frames: dict[str, str])
 
         for _ in range(random.randint(15, 30)):
             await helpers.sleep(1)
+
+
+async def explode(canvas: curses.window, center_row: int, center_column: int):
+    frames = engine.load_frames()  # TODO: use existing frame list
+    rows, columns = helpers.get_frame_size(frames["explosion_1"])
+    corner_row = center_row - rows / 2
+    corner_column = center_column - columns / 2
+
+    curses.beep()
+    for frame in [
+        frames["explosion_1"],
+        frames["explosion_2"],
+        frames["explosion_3"],
+        frames["explosion_4"],
+    ]:
+        helpers.draw_frame(canvas, corner_row, corner_column, frame)
+        await helpers.sleep(1)
+        helpers.draw_frame(canvas, corner_row, corner_column, frame, negative=True)
+        await helpers.sleep(1)
