@@ -68,10 +68,11 @@ async def animate_spaceship(
     canvas: curses.window,
     row: int,
     column: int,
-    frames: dict[str, str],
     timeout: int = 1,
 ):
-    order = [frames["rocket_frame_1"]] * timeout + [frames["rocket_frame_2"]] * timeout
+    order = [engine.frames["rocket_frame_1"]] * timeout + [
+        engine.frames["rocket_frame_2"]
+    ] * timeout
     row_speed = column_speed = 0
     for frame in itertools.cycle(order):
         helpers.draw_frame(canvas, row, column, frame)
@@ -99,6 +100,11 @@ async def animate_spaceship(
                 screen_columns - frame_columns - 1,
             ]
         )
+
+        for obstacle in engine.obstacle_list:
+            if obstacle.has_collision(row, column):
+                engine.coroutines.append(show_gameover(canvas))
+                return
 
 
 async def fly_garbage(
@@ -130,18 +136,20 @@ async def fly_garbage(
         engine.obstacle_list.remove(obstacle)
 
 
-async def fill_orbit_with_garbage(canvas: curses.window, frames: dict[str, str]):
+async def fill_orbit_with_garbage(canvas: curses.window):
     while True:
         garbage_type = random.choice(
             ["duck", "garbage_large", "garbage_small", "garbage_xl", "hubble", "lamp"]
         )
-        _, frame_width = helpers.get_frame_size(frames[garbage_type])
+        _, frame_width = helpers.get_frame_size(engine.frames[garbage_type])
 
         _, columns_number = canvas.getmaxyx()
         column = random.randint(0, columns_number - frame_width - 1)
 
         engine.coroutines.append(
-            fly_garbage(canvas, column=column, garbage_frame=frames[garbage_type])
+            fly_garbage(
+                canvas, column=column, garbage_frame=engine.frames[garbage_type]
+            )
         )
 
         for _ in range(random.randint(15, 30)):
@@ -149,19 +157,32 @@ async def fill_orbit_with_garbage(canvas: curses.window, frames: dict[str, str])
 
 
 async def explode(canvas: curses.window, center_row: int, center_column: int):
-    frames = engine.load_frames()  # TODO: use existing frame list
-    rows, columns = helpers.get_frame_size(frames["explosion_1"])
+    rows, columns = helpers.get_frame_size(engine.frames["explosion_1"])
     corner_row = center_row - rows / 2
     corner_column = center_column - columns / 2
 
     curses.beep()
     for frame in [
-        frames["explosion_1"],
-        frames["explosion_2"],
-        frames["explosion_3"],
-        frames["explosion_4"],
+        engine.frames["explosion_1"],
+        engine.frames["explosion_2"],
+        engine.frames["explosion_3"],
+        engine.frames["explosion_4"],
     ]:
         helpers.draw_frame(canvas, corner_row, corner_column, frame)
         await helpers.sleep(1)
         helpers.draw_frame(canvas, corner_row, corner_column, frame, negative=True)
+        await helpers.sleep(1)
+
+
+async def show_gameover(canvas: curses.window):
+    rows, columns = helpers.get_frame_size(engine.frames["gameover"])
+    screen_rows, screen_columns = canvas.getmaxyx()
+
+    while True:
+        helpers.draw_frame(
+            canvas,
+            screen_rows / 2 - rows / 2,
+            screen_columns / 2 - columns / 2,
+            engine.frames["gameover"],
+        )
         await helpers.sleep(1)

@@ -10,11 +10,7 @@ from game import obstacles
 TICK_TIMEOUT = 0.1
 STARS_FRACTION = 0.2
 SPACESHIP_TIMEOUT = 2
-DEBUG_MODE = True
-
-coroutines = []  # main event loop should be accessible outside of the module
-obstacle_list = []
-obstacles_in_last_collisions = []
+DEBUG_MODE = False
 
 
 def load_frames() -> dict[str, str]:
@@ -29,12 +25,17 @@ def load_frames() -> dict[str, str]:
     return frames
 
 
+coroutines = []  # main event loop should be accessible outside of the module
+obstacle_list = []
+obstacles_in_last_collisions = []
+frames = load_frames()
+
+
 def run_loop(canvas: curses.window):
     curses.curs_set(False)
     curses.update_lines_cols()
     canvas.nodelay(True)
 
-    frames = load_frames()
     screen_rows, screen_columns = canvas.getmaxyx()
 
     stars_count = round(screen_rows * screen_columns * STARS_FRACTION)
@@ -53,13 +54,12 @@ def run_loop(canvas: curses.window):
             canvas,
             screen_rows // 2,
             screen_columns // 2 - 2,
-            frames,
             SPACESHIP_TIMEOUT,
         )
     )
     coroutines.append(animation.fire(canvas, screen_rows // 2, screen_columns // 2))
 
-    coroutines.append(animation.fill_orbit_with_garbage(canvas, frames))
+    coroutines.append(animation.fill_orbit_with_garbage(canvas))
 
     if DEBUG_MODE:
         coroutines.append(obstacles.show_obstacles(canvas, obstacle_list))
